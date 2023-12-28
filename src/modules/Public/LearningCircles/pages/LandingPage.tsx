@@ -1,7 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./LandingPage.module.css";
-import imageBottom from "../Assets/LC3.webp";
-import { Link, useNavigate } from "react-router-dom";
 import {
     fetchCampusOptions,
     fetchCountryOptions,
@@ -13,16 +11,15 @@ import {
 } from "../services/LandingPageApi";
 import Select from "react-select";
 import MuLoader from "@/MuLearnComponents/MuLoader/MuLoader";
-import { MuButton } from "@/MuLearnComponents/MuButtons/MuButton";
-import { joinCircle } from "../../../Dashboard/modules/LearningCircle/services/LearningCircleAPIs";
-import toast from "react-hot-toast";
+import LcHero from "./components/LcHero";
+import LcStats from "./components/LcStats";
+import LcCards from "./components/LcCards";
 
 interface Option {
     value: string;
     label: string;
 }
 const LandingPage = () => {
-    const navigate = useNavigate();
     const [data, setData] = useState<any>([]);
     const [CountryOptions, setCountryOptions] = useState<Option[]>([]);
     const [country, setCountry] = useState(
@@ -98,9 +95,7 @@ const LandingPage = () => {
             setCampus(selectedCampus.value);
             setIgOptions(await getInterestGroups());
             setSelectedIg(null);
-
             fetchLC(setLoading, setData, district, selectedCampus.value);
-
             setData([]);
             setMsg("");
         }
@@ -137,165 +132,11 @@ const LandingPage = () => {
         })
     };
 
-    const [counters, setCounters] = useState<number[]>([0, 0, 0, 0, 0]); // Initialize counters
-    const durationInSeconds = 3; // Duration in seconds
-
-    const targetRef = useRef<HTMLDivElement>(null); // Create a ref
-
-    const isElementInViewport = (el: HTMLElement | null) => {
-        if (!el) {
-            return false;
-        }
-        const rect = el.getBoundingClientRect();
-        return (
-            rect.top >= 0 &&
-            rect.left >= 0 &&
-            rect.bottom <=
-                (window.innerHeight || document.documentElement.clientHeight) &&
-            rect.right <=
-                (window.innerWidth || document.documentElement.clientWidth)
-        );
-    };
-
-    useEffect(() => {
-        const finalValues: number[] = [
-            count?.interest_group ?? 0,
-            count?.college ?? 0,
-            count?.learning_circle ?? 0,
-            count?.total_no_of_users ?? 0
-        ];
-
-        const startCounterAnimation = () => {
-            const interval = setInterval(() => {
-                setCounters(prevCounters =>
-                    prevCounters.map((counter, index) =>
-                        counter < finalValues[index]
-                            ? counter +
-                              Math.ceil(
-                                  finalValues[index] / (durationInSeconds * 20)
-                              ) // Increment smoothly
-                            : finalValues[index]
-                    )
-                );
-            }, 50);
-
-            return () => clearInterval(interval);
-        };
-
-        let cleanup: (() => void) | undefined;
-
-        const observer = new IntersectionObserver(
-            entries => {
-                if (entries[0].isIntersecting) {
-                    cleanup = startCounterAnimation();
-                }
-            },
-            {
-                root: null,
-                rootMargin: "0px",
-                threshold: 0.5
-            }
-        );
-
-        if (targetRef.current) {
-            if (isElementInViewport(targetRef.current)) {
-                cleanup = startCounterAnimation();
-            } else {
-                observer.observe(targetRef.current);
-            }
-        }
-
-        return () => {
-            if (cleanup) {
-                cleanup();
-            }
-            if (targetRef.current) {
-                observer.unobserve(targetRef.current);
-            }
-        };
-    }, [count]);
-
-    const handleJoinClick = (id: string) => {
-        const acessToken = localStorage.getItem("accessToken");
-        if (!acessToken) {
-            toast.error("Please login to join a circle");
-            navigate("/login");
-        } else joinCircle(id);
-    };
-
     return (
         <div className={styles.LClandingPage}>
-            <nav className={styles.LClandingPageNav}>
-                <img src="https://i.ibb.co/vY786NX/image.png" alt="muLearn" />
-                <div className={styles.navLinks}>
-                    <div>
-                        <Link to="https://mulearn.org/">About</Link>
-                        <Link to="https://mulearn.org/events/">Programs</Link>
-                        <Link to="https://learn.mulearn.org/">
-                            Interest Group
-                        </Link>
-                        <Link to="https://mulearn.org/careers">Careers</Link>
-                    </div>
-                    <button
-                        onClick={() => {
-                            navigate("/dashboard/connect-discord");
-                        }}
-                    >
-                        Join Us
-                    </button>
-                </div>
-            </nav>
-
-            <div className={styles.LClandingPageHero}>
-                <div className={styles.dash}></div>
-                <div className={styles.heroTitle}>
-                    <span>
-                        <b>Introducing</b>{" "}
-                        <img src="https://i.ibb.co/FDQ2M4n/Learn.png" alt="" />
-                    </span>
-                    <b>Learning Circles</b>
-                </div>
-                <p>
-                    An informal mechanism for bringing together learners who are
-                    interested in the same topic from across different fields
-                    and disciplines. A fantastic way to spend a small amount of
-                    time learning about new things with a group of people with
-                    same interests!
-                </p>
-                <button onClick={() => navigate("/dashboard/learning-circle")}>
-                    Create/Join Learning Circles
-                </button>
-            </div>
-
-            <div className={styles.LClandingPageEarth}>
-                <div className={styles.totalCount}>
-                    <div ref={targetRef}>
-                        {counters.map((counter, index) => (
-                            <div className={styles.count} key={index}>
-                                <b>
-                                    {index > 1
-                                        ? counter >= 20
-                                            ? `${counter}+`
-                                            : counter
-                                        : counter.toLocaleString()}
-                                </b>
-                                <p>
-                                    {index === 0
-                                        ? "Interest Groups"
-                                        : index === 1
-                                        ? "Colleges"
-                                        : index === 2
-                                        ? "Learning Circles"
-                                        : index === 3
-                                        ? "Number of Users"
-                                        : ""}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-                <img src="https://i.ibb.co/BwGShc8/planet.png" alt="globe" />
-            </div>
+            <LcHero />
+			<LcStats count={count} />
+            
 
             <div className={styles.LClandingPageExplore}>
                 <div className={styles.exploreTitle}>
@@ -359,56 +200,7 @@ const LandingPage = () => {
                         <MuLoader />
                     </div>
                 ) : (
-                    <div className={styles.container}>
-                        {data.length > 0 ? (
-                            data.map((lc: LcRandom) => (
-                                <div className={styles.exploreCards}>
-                                    <img
-                                        src="https://i.ibb.co/zJkPfqB/Iot-Vector.png"
-                                        alt="png"
-                                    />
-                                    <h1>{lc.name}</h1>
-                                    <span>
-                                        <b>{lc.ig_name}</b> &nbsp;{" "}
-                                        <b>Members count: {lc.member_count}</b>{" "}
-                                        {lc.meet_place && (
-                                            <>
-                                                <br />
-                                                <b>
-                                                    Meet Place: {lc.meet_place}
-                                                </b>{" "}
-                                            </>
-                                        )}
-                                        {lc.meet_time && (
-                                            <>
-                                                <br />
-                                                <b>
-                                                    Meet Time: {lc.meet_time}
-                                                </b>{" "}
-                                            </>
-                                        )}
-                                    </span>
-                                    <div
-                                        onClick={() => {
-                                            handleJoinClick(lc.id.toString());
-                                        }}
-                                        className={styles.joinCircle}
-                                    >
-                                        Join Circle
-                                    </div>{" "}
-                                </div>
-                            ))
-                        ) : (
-                            <div className={styles.LClandingPagenone}>
-                                <img
-                                    src={imageBottom}
-                                    alt="You haven't joined any circles yet"
-                                    loading="eager"
-                                />
-                                <b>{msg}</b>
-                            </div>
-                        )}
-                    </div>
+                    <LcCards data={data} msg={msg} />
                 )}
             </div>
         </div>

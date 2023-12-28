@@ -3,7 +3,7 @@ import styles from "../LandingPage.module.css";
 
 type Props = {};
 
-const LcHero = (props: Props) => {
+const LcHero = (_props: Props) => {
 	const navigate = useNavigate();
     return (
         <>
@@ -27,6 +27,7 @@ const LcHero = (props: Props) => {
                     </button>
                 </div>
             </nav>
+
             <div className={styles.LClandingPageHero}>
                 <div className={styles.dash}></div>
                 <div className={styles.heroTitle}>
@@ -47,7 +48,6 @@ const LcHero = (props: Props) => {
                     Create/Join Learning Circles
                 </button>
             </div>
-            ;
         </>
     );
 };
