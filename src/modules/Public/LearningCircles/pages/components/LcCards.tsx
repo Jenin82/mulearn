@@ -4,8 +4,12 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import imageBottom from "../../Assets/LC3.webp";
 
+type Props = {
+	data: any[];
+	msg: string;
+};
 
-const LcCards = ({ data }: any, msg: string) => {
+const LcCards = (props: Props) => {
     const navigate = useNavigate();
 
     const handleJoinClick = (id: string) => {
@@ -18,8 +22,8 @@ const LcCards = ({ data }: any, msg: string) => {
 
     return (
         <div className={styles.container}>
-            {data.length > 0 ? (
-                data.map((lc: LcRandom) => (
+            {props.data.length > 0 ? (
+                props.data.map((lc: LcRandom) => (
                     <div className={styles.exploreCards}>
                         <img
                             src="https://i.ibb.co/zJkPfqB/Iot-Vector.png"
@@ -59,7 +63,7 @@ const LcCards = ({ data }: any, msg: string) => {
                         alt="No Learning Circles available"
                         loading="eager"
                     />
-                    <b>{msg}</b>
+                    <b>{props.msg}</b>
                 </div>
             )}
         </div>

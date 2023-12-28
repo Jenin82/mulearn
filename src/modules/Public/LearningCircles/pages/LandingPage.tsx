@@ -14,6 +14,7 @@ import MuLoader from "@/MuLearnComponents/MuLoader/MuLoader";
 import LcHero from "./components/LcHero";
 import LcStats from "./components/LcStats";
 import LcCards from "./components/LcCards";
+import { customStyles } from "../utils";
 
 interface Option {
     value: string;
@@ -107,29 +108,6 @@ const LandingPage = () => {
             setSelectedIg(selectedIg);
             fetchLC(setLoading, setData, district, campus, selectedIg.value);
         }
-    };
-
-    const customStyles: any = {
-        control: (provided: any) => ({
-            ...provided,
-            backgroundColor: "#F3F3F4",
-            border: "none",
-            borderRadius: "10px",
-            fontSize: "12px",
-            fontWeight: "bold",
-            color: "#000",
-            width: "100%",
-            padding: ".3rem .4rem",
-            minWidth: "200px"
-        }),
-        placeholder: (provided: any) => ({
-            ...provided,
-            color: "#000"
-        }),
-        indicatorSeparator: (provided: any) => ({
-            ...provided,
-            display: "none"
-        })
     };
 
     return (
