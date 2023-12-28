@@ -1,6 +1,7 @@
 interface UserData {
-    first_name: string;
-    last_name: string;
+    // first_name: string;
+    // last_name: string;
+    full_name: string;
     email: string;
     mobile: string;
     discord_id: string | null;
@@ -8,12 +9,15 @@ interface UserData {
     department: string | null;
     role: string[] | null;
     interest_groups: string[];
+    graduation_year: number | null;
+    district: string;
 }
 
 interface UserDataFromBackend {
     user_id: string;
-    first_name: string;
-    last_name: string;
+    // first_name: string;
+    // last_name: string;
+    full_name: string;
     email: string;
     mobile: string;
     gender: string;
@@ -22,6 +26,7 @@ interface UserDataFromBackend {
     role: string[] | null;
     organizations: OrgData[] | null;
     interest_groups: string[];
+    district: string;
 }
 
 interface OrgData {

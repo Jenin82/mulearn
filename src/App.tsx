@@ -42,6 +42,7 @@ import Settings from "./modules/Dashboard/modules/Settings/Settings";
 import Account from "./modules/Dashboard/modules/Settings/pages/Account/Account";
 import DiscordModeration from "./modules/Dashboard/modules/DiscordModeration/DiscordModeration";
 import Test from "./modules/Dashboard/modules/Test/Test";
+import Analytics from "./modules/Dashboard/modules/UrlShortener/Pages/Analytics";
 const Profile = lazy(
     () => import("./modules/Dashboard/modules/Profile/pages/Profile")
 );
@@ -66,11 +67,10 @@ const TaskType = lazy(() =>
     }))
 );
 
-const ManageUsersCreate = lazy(
-    () => import("./modules/Dashboard/modules/ManageUsers/ManageUsersCreate")
-);
-const ManageUsersEdit = lazy(
-    () => import("./modules/Dashboard/modules/ManageUsers/ManageUsersEdit")
+const Events = lazy(() =>
+    import("./modules/Dashboard/modules/Events/Events").then(module => ({
+        default: module.Events
+    }))
 );
 const DynamicType = lazy(
     () => import("./modules/Dashboard/modules/DynamicType/DynamicType")
@@ -261,7 +261,8 @@ function App() {
             path: "/",
             element: <AuthRoutes />,
             children: [
-                { path: "register", element: <AccountCreation /> },
+                { path: "register/:role", element: <AccountCreation /> },
+                { path: "register/", element: <AccountCreation /> },
                 { path: "login", element: <SignIn /> },
                 { path: "forgot-password", element: <ForgetPassword /> },
                 { path: "reset-password", element: <ResetPassword /> }
@@ -271,15 +272,15 @@ function App() {
             path: "/signin",
             element: <SignIn />
         },
+        // {
+        //     path: "/signup/:role",
+        //     element: <AccountCreation />
+        // },
         {
-            path: "/signup",
-            element: <AccountCreation />
-        },
-        {
-            path: "register/select-role",
+            path: "register/about",
             element: <Rolepage />
         },
-        { path: "register/select-community", element: <CommunityPage /> },
+        // { path: "register/select-community", element: <CommunityPage /> },
         {
             path: "/",
             element: <PrivateRoutes />,
@@ -289,7 +290,7 @@ function App() {
                     element: <DashboardRootLayout />,
                     children: [
                         { path: "profile", element: <Profile /> },
-                        // { path: "profileV2", element: <ProfileV2 /> },
+                        { path: "profileV2", element: <ProfileV2 /> },
                         {
                             path: "connect-discord",
                             element: <ConnectDiscord />
@@ -314,7 +315,6 @@ function App() {
                                     // might have to remove campus_lead and enabler with lead_enabler only
                                     roles={[
                                         roles.CAMPUS_LEAD,
-                                        roles.ENABLER,
                                         roles.LEAD_ENABLER
                                     ]}
                                     children={<CampusStudentList />}
@@ -329,14 +329,6 @@ function App() {
                                     children={<ManageUsers />}
                                 />
                             )
-                        },
-                        {
-                            path: "manage-users/create",
-                            element: <ManageUsersCreate />
-                        },
-                        {
-                            path: "manage-users/edit/:id",
-                            element: <ManageUsersEdit />
                         },
                         {
                             path: "manage-roles",
@@ -446,11 +438,25 @@ function App() {
                         },
                         {
                             path: "task-type",
-                            element: <TaskType />
+                            element: (
+                                <RoleChecker
+                                    roles={[roles.ADMIN]}
+                                    children={<TaskType />}
+                                />
+                            )
                         },
                         {
                             path: "tasks/bulk-import",
                             element: <TaskBulkImport />
+                        },
+                        {
+                            path: "events",
+                            element: (
+                                <RoleChecker
+                                    roles={[roles.ADMIN]}
+                                    children={<Events />}
+                                />
+                            )
                         },
                         {
                             path: "karma-voucher",
@@ -515,6 +521,19 @@ function App() {
                                         roles.ASSOCIATE
                                     ]}
                                     children={<UrlShortener />}
+                                />
+                            )
+                        },
+                        {
+                            path: "url-shortener/analytics/:id",
+                            element: (
+                                <RoleChecker
+                                    roles={[
+                                        roles.ADMIN,
+                                        roles.FELLOW,
+                                        roles.ASSOCIATE
+                                    ]}
+                                    children={<Analytics />}
                                 />
                             )
                         },

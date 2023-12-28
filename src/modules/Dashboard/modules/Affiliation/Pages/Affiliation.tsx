@@ -11,7 +11,7 @@ import Table from "@/MuLearnComponents/Table/Table";
 import THead from "@/MuLearnComponents/Table/THead";
 import Pagination from "@/MuLearnComponents/Pagination/Pagination";
 import { useFormik } from "formik";
-import { useToast } from "@chakra-ui/react";
+
 import {
     MuButton,
     PowerfulButton
@@ -25,13 +25,14 @@ type urlData = {
 const Affiliation = () => {
     const columnOrder: ColOrder[] = [
         { column: "title", Label: "Title", isSortable: true },
-        { column: "created_by", Label: "Created By", isSortable: true },
-        { column: "created_at", Label: "Created At", isSortable: true },
-        { column: "updated_by", Label: "Updated By", isSortable: true },
-        { column: "updated_at", Label: "Updated At", isSortable: true },
+        { column: "organization_count", Label: "No. of Organizations", isSortable: false },
+        { column: "created_by", Label: "Created By", isSortable: false },
+        { column: "created_at", Label: "Created At", isSortable: false },
+        { column: "updated_by", Label: "Updated By", isSortable: false },
+        { column: "updated_at", Label: "Updated At", isSortable: false },
     ];
 
-    const toast = useToast();
+    
     const [editBtn, setEditBtn] = useState(false);
     const [createBtn, setCreateBtn] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
@@ -45,14 +46,16 @@ const Affiliation = () => {
         initialValues: {
             id: "",
             title: "",
+           
         },
         onSubmit: values => {
             const affiliationCreateData = {
                 id: values.id,
                 title: values.title,
+               
             };
             if (!editBtn) {
-                createAffiliation(toast, affiliationCreateData, formik).then(result => {
+                createAffiliation( affiliationCreateData, formik).then(result => {
                     if (result) {
                         setTimeout(() => {
                             getAffiliation(
@@ -67,7 +70,7 @@ const Affiliation = () => {
                     }
                 });
             } else {
-                editAffiliation(values.id, toast, affiliationCreateData, formik).then(
+                editAffiliation(values.id, affiliationCreateData, formik).then(
                     result => {
                         if (result) {
                             setTimeout(() => {
@@ -162,20 +165,8 @@ const Affiliation = () => {
     };
 
     const handleDelete = (id: any) => {
-        deleteAffiliation(id.toString(), toast);
+        deleteAffiliation(id.toString());
         setAffiliationData(affiliationData.filter(item => item?.id !== id));
-    };
-    const handleCopy = (id: any) => {
-        navigator.clipboard.writeText(
-            affiliationData.filter(item => item?.id === id)[0].title
-        );
-        console.log(affiliationData.filter(item => item?.id === id)[0].title);
-        toast({
-            title: "Copied",
-            status: "success",
-            duration: 2000,
-            isClosable: true
-        });
     };
 
     useEffect(() => {

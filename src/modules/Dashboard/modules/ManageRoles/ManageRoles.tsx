@@ -5,18 +5,23 @@ import THead from "@/MuLearnComponents/Table/THead";
 import TableTop from "@/MuLearnComponents/TableTop/TableTop";
 import { deleteManageRoles, getManageRoles } from "./apis";
 import { useNavigate } from "react-router-dom";
-import { MuButton, PowerfulButton } from "@/MuLearnComponents/MuButtons/MuButton";
+import {
+    MuButton,
+    PowerfulButton
+} from "@/MuLearnComponents/MuButtons/MuButton";
 import { AiOutlinePlusCircle, AiOutlineUser } from "react-icons/ai";
 import styles from "./Manageroles.module.css";
 import modalStyles from "./components/Modal.module.css";
 import { dashboardRoutes } from "@/MuLearnServices/urls";
-import { useToast } from "@chakra-ui/react";
+
 import Modal from "./components/Modal";
 import ManageRolesEditModal from "./components/ManageRolesEditModal";
 import ManageRolesCreateModal from "./components/ManageRolesCreateModal";
 import { getRoles } from "../../../../modules/Common/Authentication/services/onboardingApis";
 import ManageUsers from "./components/ManageUsers";
 import { Blank } from "@/MuLearnComponents/Table/Blank";
+
+import { IoPersonAddOutline } from "react-icons/io5";
 
 function ManageRoles() {
     const [data, setData] = useState<any[]>([]);
@@ -26,12 +31,20 @@ function ManageRoles() {
     const [sort, setSort] = useState("-created_at");
     const [isLoading, setIsLoading] = useState(false);
     const firstFetch = useRef(true);
+
     //Modal
     const [currRoleID, setCurrRoleID] = useState("");
     const [currModal, setCurrModal] = useState<
         null | "create" | "edit" | "users"
     >(null);
     const [roles, setRoles] = useState<any>();
+
+    //Bulk Assign
+    const [currRole, setCurrRole] = useState<{
+        title: string;
+        id: string;
+    } | null>();
+
     const icons = {
         user: (
             <div className={modalStyles.TickIcon}>
@@ -79,11 +92,27 @@ function ManageRoles() {
         // { column: "id", Label: "ID", isSortable: true },
         { column: "title", Label: "Title", isSortable: true },
         { column: "description", Label: "Description", isSortable: true },
-        { column: "users_with_role", Label: "Members", isSortable: false },
+        { column: "members", Label: "Members", isSortable: false },
         { column: "updated_at", Label: "Updated On", isSortable: true },
         { column: "updated_by", Label: "Updated By", isSortable: true },
         { column: "created_by", Label: "Created By", isSortable: true },
-        { column: "created_at", Label: "Created On", isSortable: true }
+        { column: "created_at", Label: "Created On", isSortable: true },
+        {
+            column: "bulk_assign",
+            Label: "Assign",
+            isSortable: false,
+            wrap: (data: any, id: any, row: any) => (
+                <div
+                    onClick={() => {
+                        setCurrModal("users");
+                        setCurrRole({ id: id, title: row.title });
+                    }}
+                    className={styles.cursor}
+                >
+                    <IoPersonAddOutline size={20} />
+                </div>
+            )
+        }
     ];
 
     const handleNextClick = () => {
@@ -160,9 +189,9 @@ function ManageRoles() {
         setCurrRoleID(id as string);
         setCurrModal("edit");
     };
-    const toast = useToast();
+
     const handleDelete = (id: string | undefined) => {
-        deleteManageRoles(id, toast);
+        deleteManageRoles(id);
         getManageRoles(
             setData,
             1,
@@ -191,7 +220,8 @@ function ManageRoles() {
     const handleCreate = () => {
         setCurrModal("create");
     };
-    const handleUsers = () => {
+    const handleUsers = (role?: any) => {
+        console.log(role);
         setCurrModal("users");
     };
 
@@ -263,12 +293,13 @@ function ManageRoles() {
                               <Modal
                                   onClose={setCurrModal}
                                   icon={icons.user}
-                                  header="Edit User Roles"
-                                  paragraph="Change users in current role"
+                                  header="Bulk Change User Roles"
+                                  paragraph={`Change users in ${currRole?.title}`}
                               >
                                   <ManageUsers
                                       onClose={setCurrModal}
                                       roles={roles}
+                                      currRole={currRole!}
                                   />
                               </Modal>
                           );
@@ -276,14 +307,6 @@ function ManageRoles() {
                 : ""}
 
             <div className={styles.createBtnContainer}>
-                <PowerfulButton
-                    className={styles.createUserBtn}
-                    onClick={handleUsers}
-                >
-                    <AiOutlinePlusCircle />
-                    Users
-                </PowerfulButton>
-
                 <PowerfulButton
                     className={styles.createBtn}
                     onClick={handleCreate}

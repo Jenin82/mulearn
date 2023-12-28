@@ -13,6 +13,9 @@ import {
 } from "../services/LandingPageApi";
 import Select from "react-select";
 import MuLoader from "@/MuLearnComponents/MuLoader/MuLoader";
+import { MuButton } from "@/MuLearnComponents/MuButtons/MuButton";
+import { joinCircle } from "../../../Dashboard/modules/LearningCircle/services/LearningCircleAPIs";
+import toast from "react-hot-toast";
 
 interface Option {
     value: string;
@@ -122,7 +125,7 @@ const LandingPage = () => {
             color: "#000",
             width: "100%",
             padding: ".3rem .4rem",
-            minWidth: "200px",
+            minWidth: "200px"
         }),
         placeholder: (provided: any) => ({
             ...provided,
@@ -148,15 +151,14 @@ const LandingPage = () => {
             rect.top >= 0 &&
             rect.left >= 0 &&
             rect.bottom <=
-            (window.innerHeight || document.documentElement.clientHeight) &&
+                (window.innerHeight || document.documentElement.clientHeight) &&
             rect.right <=
-            (window.innerWidth || document.documentElement.clientWidth)
+                (window.innerWidth || document.documentElement.clientWidth)
         );
     };
 
     useEffect(() => {
         const finalValues: number[] = [
-
             count?.interest_group ?? 0,
             count?.college ?? 0,
             count?.learning_circle ?? 0,
@@ -169,9 +171,9 @@ const LandingPage = () => {
                     prevCounters.map((counter, index) =>
                         counter < finalValues[index]
                             ? counter +
-                            Math.ceil(
-                                finalValues[index] / (durationInSeconds * 20)
-                            ) // Increment smoothly
+                              Math.ceil(
+                                  finalValues[index] / (durationInSeconds * 20)
+                              ) // Increment smoothly
                             : finalValues[index]
                     )
                 );
@@ -213,11 +215,57 @@ const LandingPage = () => {
         };
     }, [count]);
 
-
+    const handleJoinClick = (id: string) => {
+        const acessToken = localStorage.getItem("accessToken");
+        if (!acessToken) {
+            toast.error("Please login to join a circle");
+            navigate("/login");
+        } else joinCircle(id);
+    };
 
     return (
         <div className={styles.LClandingPage}>
-            
+            <nav className={styles.LClandingPageNav}>
+                <img src="https://i.ibb.co/vY786NX/image.png" alt="muLearn" />
+                <div className={styles.navLinks}>
+                    <div>
+                        <Link to="https://mulearn.org/">About</Link>
+                        <Link to="https://mulearn.org/events/">Programs</Link>
+                        <Link to="https://learn.mulearn.org/">
+                            Interest Group
+                        </Link>
+                        <Link to="https://mulearn.org/careers">Careers</Link>
+                    </div>
+                    <button
+                        onClick={() => {
+                            navigate("/dashboard/connect-discord");
+                        }}
+                    >
+                        Join Us
+                    </button>
+                </div>
+            </nav>
+
+            <div className={styles.LClandingPageHero}>
+                <div className={styles.dash}></div>
+                <div className={styles.heroTitle}>
+                    <span>
+                        <b>Introducing</b>{" "}
+                        <img src="https://i.ibb.co/FDQ2M4n/Learn.png" alt="" />
+                    </span>
+                    <b>Learning Circles</b>
+                </div>
+                <p>
+                    An informal mechanism for bringing together learners who are
+                    interested in the same topic from across different fields
+                    and disciplines. A fantastic way to spend a small amount of
+                    time learning about new things with a group of people with
+                    same interests!
+                </p>
+                <button onClick={() => navigate("/dashboard/learning-circle")}>
+                    Create/Join Learning Circles
+                </button>
+            </div>
 
             <div className={styles.LClandingPageEarth}>
                 <div className={styles.totalCount}>
@@ -235,12 +283,12 @@ const LandingPage = () => {
                                     {index === 0
                                         ? "Interest Groups"
                                         : index === 1
-                                            ? "Colleges"
-                                            : index === 2
-                                                ? "Learning Circles"
-                                                : index === 3
-                                                    ? "Number of Users"
-                                                    : ""}
+                                        ? "Colleges"
+                                        : index === 2
+                                        ? "Learning Circles"
+                                        : index === 3
+                                        ? "Number of Users"
+                                        : ""}
                                 </p>
                             </div>
                         ))}
@@ -306,11 +354,12 @@ const LandingPage = () => {
                     </div>
                 </form>
 
-                {loading ?
+                {loading ? (
                     <div className={styles.loader}>
                         <MuLoader />
                     </div>
-                    : <div className={styles.container}>
+                ) : (
+                    <div className={styles.container}>
                         {data.length > 0 ? (
                             data.map((lc: LcRandom) => (
                                 <div className={styles.exploreCards}>
@@ -321,8 +370,32 @@ const LandingPage = () => {
                                     <h1>{lc.name}</h1>
                                     <span>
                                         <b>{lc.ig_name}</b> &nbsp;{" "}
-                                        <b>Members count: {lc.member_count}</b>
+                                        <b>Members count: {lc.member_count}</b>{" "}
+                                        {lc.meet_place && (
+                                            <>
+                                                <br />
+                                                <b>
+                                                    Meet Place: {lc.meet_place}
+                                                </b>{" "}
+                                            </>
+                                        )}
+                                        {lc.meet_time && (
+                                            <>
+                                                <br />
+                                                <b>
+                                                    Meet Time: {lc.meet_time}
+                                                </b>{" "}
+                                            </>
+                                        )}
                                     </span>
+                                    <div
+                                        onClick={() => {
+                                            handleJoinClick(lc.id.toString());
+                                        }}
+                                        className={styles.joinCircle}
+                                    >
+                                        Join Circle
+                                    </div>{" "}
                                 </div>
                             ))
                         ) : (
@@ -336,7 +409,7 @@ const LandingPage = () => {
                             </div>
                         )}
                     </div>
-                }
+                )}
             </div>
         </div>
     );
