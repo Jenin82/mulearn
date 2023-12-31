@@ -1,18 +1,60 @@
 import { privateGateway } from "@/MuLearnServices/apiGateways";
+import { dynamicRoute, getLocationRoutes } from "@/MuLearnServices/endpoints";
 import { dashboardRoutes, onboardingRoutes } from "@/MuLearnServices/urls";
 import { AxiosError } from "axios";
 import { Dispatch } from "react";
 
-interface Option {
-    value: string;
-    label: string;
-}
+export const fetchCountryOptions = async () => {
+    try {
+        const response = await privateGateway.get(
+            dynamicRoute(getLocationRoutes.getCountries)
+        );
+        return response.data.response.countries
+            .sort((a: BackendOption, b: BackendOption) =>
+                a.name.localeCompare(b.name)
+            )
+            .map((country: BackendOption) => ({
+                value: country.id,
+                label: country.name
+            }));
+    } catch (err: unknown) {
+        const error = err as AxiosError;
+        if (error?.response) {
+            throw error;
+        }
+    }
+};
+
+export const fetchStateOptions = async (country: string) => {
+    try {
+        const response = await privateGateway.get(
+            dynamicRoute(getLocationRoutes.getStates),
+			{
+				params: {
+					country: country
+				}
+			}
+        )
+        return response.data.response.states
+            .sort((a: BackendOption, b: BackendOption) => a.name.localeCompare(b.name))
+            .map((sate: BackendOption) => ({
+                value: sate.id,
+                label: sate.name
+            }));
+    } catch (err: unknown) {
+        const error = err as AxiosError;
+        if (error?.response) {
+            throw error;
+        }
+    }
+};
+
 export const fetchLC = async (
     setLoading: UseStateFunc<boolean>,
     setData: UseStateFunc<any>,
     district?: string,
     campus?: string,
-    ig?: string | null,
+    ig?: string | null
 ) => {
     setLoading(true);
     try {
@@ -35,54 +77,9 @@ export const fetchLC = async (
     }
 };
 
-	export const fetchCountryOptions = async (
-		setCountry: UseStateFunc<Option[]>
-	) => {
-		try {
-			const response = await privateGateway.get(onboardingRoutes.countryList);
-			setCountry(
-				response.data.response.countries
-					.sort((a: any, b: any) => a.name.localeCompare(b.name))
-					.map((country: any) => ({
-						value: country.id,
-						label: country.name
-					}))
-			);
-		} catch (err: unknown) {
-			const error = err as AxiosError;
-			if (error?.response) {
-				throw error;
-			}
-		}
-	};
+	
 
-	export const fetchStateOptions = async (
-		country: string,
-		setState: UseStateFunc<Option[]>
-	) => {
-		try {
-			const response = (await privateGateway.post(
-				onboardingRoutes.stateList,
-				{
-					country: country
-				}
-			)) as APIResponse<{ states: { id: string; name: string }[] }>;
-			const message = response?.data;
-			setState(
-				response.data.response.states
-					.sort((a, b) => a.name.localeCompare(b.name))
-					.map(sate => ({
-						value: sate.id,
-						label: sate.name
-					}))
-			);
-		} catch (err: unknown) {
-			const error = err as AxiosError;
-			if (error?.response) {
-				throw error;
-			}
-		}
-	};
+	
 
 	export const fetchDistrictOptions = async (
 		state: string,

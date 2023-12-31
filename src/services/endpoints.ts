@@ -26,3 +26,10 @@ export const EventsRoutes = {
     getEvents: "api/v1/dashboard/events/", // get and post
     editEvents: "api/v1/dashboard/events/${EventID}/" // put and delete
 }
+
+export const getLocationRoutes = {
+	getCountries: "api/v1/public/list/country/",
+	getStates: "api/v1/public/list/state/",
+	getDistricts: "api/v1/public/list/district/",
+	getColleges: "api/v1/public/list/college/",
+}

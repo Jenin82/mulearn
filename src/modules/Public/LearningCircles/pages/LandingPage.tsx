@@ -24,7 +24,7 @@ const LandingPage = () => {
     const [data, setData] = useState<any>([]);
     const [CountryOptions, setCountryOptions] = useState<Option[]>([]);
     const [country, setCountry] = useState(
-        "f1840070-ec45-4b09-b582-763482137474"
+        "3ceeb230-06a2-48de-8c5b-e6c64cf9059f"
     );
     const [stateOptions, setStateOptions] = useState<Option[]>([]);
     const [state, setState] = useState("44c63af8-8747-43d1-8402-ba79215d4bed");

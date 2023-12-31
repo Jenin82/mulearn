@@ -13,3 +13,20 @@ interface LcCount {
     learning_circle: number;
     total_no_of_users: number;
 }
+
+interface Option {
+    value: string;
+    label: string;
+}
+
+interface BackendOption {
+    id: string;
+    name: string;
+}
+
+interface SelectedOptions {
+    country: Option | null;
+    state: Option | null;
+    district: Option | null;
+    campus: Option | null;
+}
